@@ -8,5 +8,5 @@ fi
 
 cat $1 | while read -r line;
 do
-    echo -e $(line)
+    echo -e "${line}"
 done

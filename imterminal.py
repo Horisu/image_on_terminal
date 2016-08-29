@@ -1,8 +1,8 @@
 from x256 import x256
-import cv2
 import os
+import time
 from optparse import OptionParser
-
+from PIL import Image
 
 class ImTerminal:
 
@@ -11,20 +11,27 @@ class ImTerminal:
         self.h = height
 
     def convert(self, image):
-        h, w = image.shape[:2]
+        if self.w or self.h:
+            if self.w:
+                w = int(self.w)
+            else:
+                w = image.size[0]
+            if self.h:
+                h = int(self.h)
+            else:
+                h = image.size[1]
+            im = image.resize((w,h))
 
-        print "height = {}".format(h)
-        print "width  = {}".format(w)
-
-        b = 0
-        g = 1
-        r = 2
-
+        else:
+            (w, h) = image.size
+            im = image
         tmp = ""
+        index = 0
         for i in range(h):
             for j in range(w):
-                tmp = tmp + '\\e[48;5;' + str( x256.from_rgb(image[i,j,r],image[i,j,g],image[i,j,b]) ) + "m" + "  "
-
+                px = im.getpixel((j,i))
+                tmp = tmp + '\\e[48;5;' + str( x256.from_rgb(px[0],px[1],px[2]) ) + "m" + "  "
+                index += 1
             tmp = tmp + '\\e[0m'
             tmp = tmp + "\n"
 
@@ -53,8 +60,8 @@ if __name__ == '__main__':
         print "{} already exists".format(opt.output)
         os.remove(opt.output)
         print "{} is removed".format(opt.output)
-                    
-    image = cv2.imread(opt.image);
+
+    image = Image.open(opt.image);
 
     f = open(opt.output, "w")
 
